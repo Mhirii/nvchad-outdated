@@ -1,9 +1,26 @@
 
 local M = {}
 
+local function move_or_create_win(key)
+  local fn = vim.fn
+  local curr_win = fn.winnr()
+  vim.cmd("wincmd " .. key) --> attempt to move
+
+  if curr_win == fn.winnr() then --> didn't move, so create a split
+    if key == "h" or key == "l" then
+      vim.cmd "wincmd v"
+    else
+      vim.cmd "wincmd s"
+    end
+
+    vim.cmd("wincmd " .. key)
+  end
+end
+
 M.disabled = {
   n = {
     ["<leader>b"] = "",
+    ["<leader>rn"] = { ""}
   },
 }
 
@@ -13,6 +30,8 @@ M.general = {
     ["<C-d>"] = { "<C-d>zz", " Scroll down", opts = { silent = true } },
     ["<C-u>"] = { "<C-u>zz", " Scroll up", opts = { silent = true } },
 
+
+    ["<leader><leader>rn"] = { "<cmd> set rnu! <CR>", "Toggle relative number" },
 
     ["<leader>cs"] = { "<CMD>SymbolsOutline<CR>", " Symbols Outline" },
     ["<leader>tr"] = {
@@ -154,6 +173,10 @@ M.lspsaga = {
       end,
       " Go to definition",
     },
+    ["<leader>rn"] = {
+      "<CMD>Lspsaga rename<CR>",
+      " rename",
+    },
     ["gd"] = {
       "<CMD>Lspsaga goto_definition<CR>",
       " Go to definition",
@@ -233,4 +256,180 @@ M.nvimtree = {
 }
 
 
+M.split = {
+  n = {
+    ["<C-h>"] = {
+      function()
+        move_or_create_win "h"
+      end,
+      "[h]: Move to window on the left or create a split",
+    },
+    ["<C-j>"] = {
+      function()
+        move_or_create_win "j"
+      end,
+      "[j]: Move to window below or create a vertical split",
+    },
+    ["<C-k>"] = {
+      function()
+        move_or_create_win "k"
+      end,
+      "[k]: Move to window above or create a vertical split",
+    },
+    ["<C-l>"] = {
+      function()
+        move_or_create_win "l"
+      end,
+      "[l]: Move to window on the right or create a split",
+    },
+  },
+}
+
+M.text = {
+  i = {
+    -- Move line up and down
+    ["<C-Up>"] = { "<CMD>m .-2<CR>==", "󰜸 Move line up" },
+    ["<C-Down>"] = { "<CMD>m .+1<CR>==", "󰜯 Move line down" },
+
+    -- Navigate
+    ["<A-Left>"] = { "<ESC>I", " Move to beginning of line" },
+    ["<A-Right>"] = { "<ESC>A", " Move to end of line" },
+    ["<A-d>"] = { "<ESC>diw", " Delete word" },
+    ["<S-CR>"] = {
+      function()
+        vim.cmd "normal o"
+      end,
+      " New line",
+    },
+  },
+
+  n = {
+    -- Navigate
+    ["<C-Left>"] = { "<ESC>_", "󰜲 Move to beginning of line" },
+    ["<C-Right>"] = { "<ESC>$", "󰜵 Move to end of line" },
+    ["<C-a>"] = { "gg0vG", " Select all" },
+    ["<F3>"] = { "n", " Next" },
+    ["<S-F3>"] = { "N", " Previous" },
+    -- Operations
+    ["<C-z>"] = { "<CMD>u<CR>", "󰕌 Undo" },
+    ["<C-r>"] = { "<CMD>redo<CR>", "󰑎 Redo" },
+    ["<C-x>"] = { "x", "󰆐 Cut" },
+    ["<C-v>"] = { "p", "󰆒 Paste" },
+    ["<C-c>"] = { "y", " Copy" },
+    ["p"] = { "p`[v`]=", "󰆒 Paste" },
+    ["<leader><leader>d"] = { "viw", " Select word" },
+    ["<leader>d"] = { 'viw"_di', " Delete word" },
+    ["<C-Up>"] = { "<CMD>m .-2<CR>==", "󰜸 Move line up" },
+    ["<C-Down>"] = { "<CMD>m .+1<CR>==", "󰜯 Move line down" },
+    -- Renamer
+    -- ["<leader>mrn"] = { "<CMD>:MurenToggle<CR>", "󱝪 Toggle Search" },
+    ["<leader>sp"] = { "<CMD>:TSJToggle<CR>", "󰯌 Toggle split/join" },
+    ["<A-d>"] = { "<CMD>:MCstart<CR>", "Multi cursor" },
+    ["<leader>ra"] = {
+      function()
+        require("nvchad.renamer").open()
+      end,
+      "󰑕 LSP rename",
+    },
+    -- ["<leader>mrn"] = {
+    --   function()
+    --     return ":IncRename " .. vim.fn.expand "<cword>"
+    --   end,
+    --   -- ":IncRename "
+    --   "󰑕 Rename",
+    --   opts = { expr = true },
+    -- },
+    -- Quit
+    ["<Esc>"] = {
+      function()
+        vim.cmd "noh"
+        vim.cmd "Noice dismiss"
+      end,
+      " Clear highlights",
+      opts = { silent = true },
+    },
+  },
+
+  v = {
+    ["<C-Up>"] = { ":m'<-2<CR>gv=gv", "󰜸 Move selection up", opts = { silent = true } },
+    ["<C-Down>"] = { ":m'>+1<CR>gv=gv", "󰜯 Move selection down", opts = { silent = true } },
+    ["<Home>"] = { "gg", "Home" },
+    ["<End>"] = { "G", "End" },
+    ["y"] = { "y`]", "Yank and move to end" },
+    -- Indent backward/forward:
+    ["<"] = { "<gv", " Ident backward", opts = { silent = false } },
+    [">"] = { ">gv", " Ident forward", opts = { silent = false } },
+
+    ["<C-Left>"] = { "<ESC>_", "󰜲 Move to beginning of line" },
+    ["<C-Right>"] = { "<ESC>$", "󰜵 Move to end of line" },
+  },
+
+  c = {
+    -- Autocomplete for brackets:
+    ["("] = { "()<left>", "Auto complete (", opts = { silent = false } },
+    ["<"] = { "<><left>", "Auto complete <", opts = { silent = false } },
+    ['"'] = { '""<left>', [[Auto complete "]], opts = { silent = false } },
+    ["'"] = { "''<left>", "Auto complete '", opts = { silent = false } },
+  },
+}
+
+M.window = {
+  n = {
+    ["<leader><leader>h"] = { "<CMD>vs <CR>", "󰤼 Vertical split", opts = { nowait = true } },
+    ["<leader><leader>v"] = { "<CMD>sp <CR>", "󰤻 Horizontal split", opts = { nowait = true } },
+  },
+}
+
+M.diagnostics = {
+  n = {
+    ["<leader>t"] = { "<CMD>TroubleToggle<CR>", "󰔫 Toggle warnings" },
+    ["<leader>td"] = { "<CMD>TodoTrouble keywords=TODO,FIX,FIXME,BUG,TEST,NOTE<CR>", " Todo/Fix/Fixme" },
+    ["<leader>el"] = { "<CMD>ErrorLensToggle<CR>", "󱇭 Toggle error lens" },
+    ["<leader>ft"] = { "<CMD>TodoTelescope<CR>", " Telescope TODO" },
+    ["<Leader>ll"] = {
+      function()
+        require("lsp_lines").toggle()
+      end,
+      " Toggle lsp_lines",
+    },
+  },
+}
+
+M.test = {
+  n = {
+    ["<leader>rt"] = {
+      function()
+        require("neotest").run.run(vim.fn.expand "%")
+      end,
+      "󰤑 Run neotest",
+    },
+  },
+}
+
+M.folder = {
+  n = {
+    ["<leader>a"] = {
+      function()
+        require("fold-cycle").toggle_all()
+      end,
+      "󰴋 Toggle folder",
+    },
+    ["<leader>fp"] = {
+      function()
+        require("fold-preview").toggle_preview()
+      end,
+      "󱞊 Fold preview",
+    },
+  },
+}
+
+M.searchbox = {
+  n = {
+    ["<C-F>"] = { "<CMD> SearchBoxMatchAll clear_matches=true<CR>", "󱘟 Search matching all" },
+    ["<leader>sr"] = { "<CMD> SearchBoxReplace confirm=menu<CR>", " Replace" },
+  },
+}
+
+
 return M
+
