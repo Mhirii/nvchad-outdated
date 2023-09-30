@@ -4,7 +4,7 @@ local null_ls = require("null-ls")
 local opts = {
   sources={
     -- typescript
-    null_ls.builtins.diagnostics.eslint,
+    -- null_ls.builtins.diagnostics.eslint_d,
     null_ls.builtins.formatting.prettier,
     --go
     null_ls.builtins.formatting.gofumpt,
