@@ -8,7 +8,8 @@ local status = require("custom.utils").status
 ---@type NvPluginSpec[]
 local plugins = {
 
-  { "nvim-treesitter/nvim-treesitter",
+  {
+    "nvim-treesitter/nvim-treesitter",
     opts = {
       ensure_installed = {
         -- defaults
@@ -16,7 +17,7 @@ local plugins = {
         "lua",
         -- web dev
         "html",
-        "css",
+        -- "css",
         "javascript",
         "typescript",
         "tsx",
@@ -4733,6 +4734,17 @@ local plugins = {
         desc = "Normal Mode",
       },
     },
+  },
+
+  {
+    "olexsmir/gopher.nvim",
+    ft = "go",
+    config = function(_, opts)
+      require("gopher").setup(opts)
+    end,
+    build = function()
+      vim.cmd [[silent! GoInstallDeps]]
+    end,
   },
 }
 

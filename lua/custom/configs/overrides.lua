@@ -5,12 +5,13 @@ M.treesitter = {
     "vim",
     "lua",
     "html",
-    "css",
+    -- "css",
     "javascript",
     "typescript",
     "tsx",
     "c",
     "rust",
+    "go",
     "markdown",
     "markdown_inline",
   },
@@ -42,6 +43,9 @@ M.mason = {
 
     -- Rust stuff
     "rust-analyzer",
+
+    -- Go stuff
+    "gopls",
 
     -- Shell stuff
     "shellcheck",
