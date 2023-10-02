@@ -1,175 +1,291 @@
+-- To find any highlight groups: "<cmd> Telescope highlights"
+-- Each highlight group can take a table with variables fg, bg, bold, italic, etc
+-- base30 variable names can also be used as colors
 
 local M = {}
 
 ---@type Base46HLGroupsList
 M.override = {
-  -- Cursor
-  Cursor = { bg = "white", fg = "black2" },
-  CursorLine = { bg = "black2" },
-  Comment = { italic = true },
-  NvDashAscii = { fg = "purple", bg = "none" },
-  IndentBlanklineContextStart = { bg = "none" },
+  Comment = {
+    italic = false,
+  },
 
-  -- TreeSitter highlights
-  Repeat = { fg = "pink" },
-  Include = { fg = "pink" },
-  ["@definition"] = { underline = false },
-  ["@variable"] = { fg = "white" },
-  ["@namespace"] = { fg = "white" },
-  ["@function.builtin"] = { fg = "cyan" },
-  ["@function.call"] = { fg = "green" },
-  ["@boolean"] = { fg = "green" },
-  ["@text.danger"] = { fg = "red" },
-  ["@text.note"] = { fg = "blue" },
-  ["@text.header"] = { bold = true },
-  ["@text.diff.add"] = { fg = "green" },
-  ["@text.diff.delete"] = { fg = "red" },
-  ["@text.todo"] = { fg = "blue" },
-  ["@string.special"] = { fg = "blue" },
-  ["@class.css"] = { fg = "green" },
-  ["@class.scss"] = { link = "@class.css" },
-  ["@property.css"] = { fg = "teal" },
-  ["@property.scss"] = { link = "@property.css" },
-  ["@lsp.type.keyword"] = { link = "Keyword" },
-  ["@lsp.type.operator"] = { link = "Operator" },
-  ["@lsp.type.parameter"] = { link = "@parameter" },
-  ["@lsp.type.property"] = { link = "@property" },
-  ["@lsp.typemod.method.reference"] = { link = "Function" },
-  ["@lsp.typemod.method.trait"] = { link = "Function" },
-  ["@lsp.typemod.selfKeyword.defaultLibrary"] = { link = "Keyword" },
+  NvDashAscii = {
+    bg = "none",
+    fg = "orange",
+  },
 
-  -- Copilot
-  CopilotSuggestion = { fg = "#83a598" },
-  CopilotAnnotation = { fg = "#03a598" },
-
-  -- NvimTree
-  NvimTreeGitNew = { fg = "green" },
-  NvimTreeGitDirty = { fg = "yellow" },
-  NvimTreeGitDeleted = { fg = "red" },
-  NvimTreeCursorLine = { bg = "one_bg3" },
+  NvDashButtons = {
+    fg = "light_grey",
+    bg = "none",
+  },
 }
 
 ---@type HLTable
 M.add = {
+  NvimTreeOpenedFolderName = { fg = "green", bold = true },
 
-  EdgyWinBar = { bg = "black", fg = "white" },
-  EdgyWinBarInactive = { bg = "black", fg = "white" },
-  EdgyNormal = { bg = "black", fg = "white" },
+  -- modicator.nvim
+  -- stylua: ignore start
+  NormalMode         = { fg = "blue",          bold = true },
+  InsertMode         = { fg = "purple",        bold = true },
+  VisualMode         = { fg = "cyan",          bold = true },
+  CommandMode        = { fg = "vibrant_green", bold = true },
+  ReplaceMode        = { fg = "orange",        bold = true },
+  SelectMode         = { fg = "nord_blue",     bold = true },
+  TerminalMode       = { fg = "green",         bold = true },
+  TerminalNormalMode = { fg = "sun",           bold = true },
+  -- stylua: ignore end
+  -- end modicator.nvim
 
-  YankVisual = { fg = "black2", bg = "cyan" },
+  -- harpoon FIXME: None of these actually work
+  -- stylua: ignore start
+  HarpoonInactive       = { fg = "purple", bold = true },
+  HarpoonActive         = { fg = "white",  bold = true },
+  HarpoonNumberActive   = { fg = "blue",   bold = true },
+  HarpoonNumberInactive = { fg = "blue",   bold = true },
+  TabLineFill           = { fg = "white",  bold = true },
+  -- stylua: ignore end
+  -- end harpoon
 
-  MultiCursor = { bg = "white", fg = "black2" },
-  MultiCursorMain = { bg = "white", fg = "black2" },
+  -- nvim-biscuits
+  BiscuitColor = { fg = "sun" }, -- TODO: make it more sense
+  -- end nvim-biscuits
 
-  DapBreakpoint = { fg = "red" },
+  -- Stutusline
+  -- stylua: ignore start
+  StBg            = { bg = "statusline_bg"                       },
+  StGroup         = { --[[ fg = "grey",]]   bg = "statusline_bg" },
+  StEncoding      = { fg = "white",         bg = "statusline_bg" },
+  StBrowser       = { fg = "blue",          bg = "statusline_bg" },
+  StCody          = { fg = "green",         bg = "statusline_bg" },
+  StCopilot       = { fg = "yellow",        bg = "statusline_bg" },
+  StDebug         = { fg = "red",           bg = "statusline_bg" },
+  StDiscord       = { fg = "nord_blue",     bg = "statusline_bg" },
+  StGit           = { fg = "orange",        bg = "statusline_bg" },
+  StGithub        = { fg = "white",         bg = "statusline_bg" },
+  StHome          = { fg = "yellow",        bg = "statusline_bg" },
+  StIRC           = { fg = "white",         bg = "statusline_bg" },
+  StKernel        = { fg = "white",         bg = "statusline_bg" },
+  StMail          = { fg = "yellow",        bg = "statusline_bg" },
+  StReddit        = { fg = "white",         bg = "statusline_bg" },
+  StStackOverflow = { fg = "orange",        bg = "statusline_bg" },
+  StHN            = { fg = "orange",        bg = "statusline_bg" },
+  StGames         = { fg = "white",         bg = "statusline_bg" },
+  StTranslate     = { fg = "nord_blue",     bg = "statusline_bg" },
+  StWhatsapp      = { fg = "vibrant_green", bg = "statusline_bg" },
+  StWorld         = { fg = "nord_blue",     bg = "statusline_bg" },
+  -- stylua: ignore end
+  -- end Statusline
 
-  LightBulbSign = { bg = "black", fg = "yellow" },
+  -- neotest
+  -- stylua: ignore start
+  NeotestAdapterName  = { fg = "red"           },
+  NeotestBorder       = { fg = "purple"        },
+  NeotestDir          = { fg = "teal"          },
+  NeotestFailed       = { fg = "red"           },
+  NeotestFile         = { fg = "white"         },
+  NeotestFocused      = { fg = "green"         },
+  NeotestExpandMarker = { fg = "sun"           },
+  NeotestIndent       = { fg = "sun"           },
+  NeotestMarked       = { fg = "red"           },
+  NeotestNamespace    = { fg = "purple"        },
+  NeotestPassed       = { fg = "green"         },
+  NeotestRunning      = { fg = "grey"          },
+  NeotestWinSelect    = { fg = "baby_pink"     },
+  NeotestSkipped      = { fg = "grey_fg2"      },
+  NeotestTarget       = { fg = "vibrant_green" },
+  NeotestTest         = { fg = "dark_purple"   },
+  NeotestUnknown      = { fg = "grey"          },
+  NeotestWatching     = { fg = "light_grey"    },
+  -- stylua: ignore end
+  -- end neotest
 
-  NvimTreeOpenedFolderName = { fg = "purple", bold = true },
-  NvimTreeOpenedFile = { fg = "green", bold = true },
+  -- neogit
+  -- PR: NEEDED
+  -- stylua: ignore start
+  -- NeogitRemote                  = { fg = "white"               },
+  -- NeogitObjectId                = { fg = "white"               },
+  -- NeogitStash                   = { fg = "white"               },
+  -- NeogitFold                    = { fg = "white"               },
+  -- NeogitRebaseDone              = { fg = "white"               },
+  -- NeogitTagName                 = { fg = "white"               },
+  -- NeogitTagDistance             = { fg = "white"               },
+  -- NeogitSectionHeader           = { fg = "white"               },
+  -- NeogitUnpushedTo              = { fg = "white"               },
+  -- NeogitUnmergedInto            = { fg = "white"               },
+  -- NeogitUnpulledFrom            = { fg = "white"               },
+  -- NeogitUntrackedfiles          = { fg = "white"               },
+  -- NeogitUnstagedchanges         = { fg = "white"               },
+  -- NeogitUnmergedchanges         = { fg = "white"               },
+  -- NeogitUnpulledchanges         = { fg = "white"               },
+  -- NeogitRecentcommits           = { fg = "white"               },
+  -- NeogitStagedchanges           = { fg = "white"               },
+  -- NeogitStashes                 = { fg = "white"               },
+  -- NeogitRebasing                = { fg = "white"               },
+  -- NeogitReverting               = { fg = "white"               },
+  -- NeogitPicking                 = { fg = "white"               },
+  -- NeogitChangeModified          = { fg = "white"               },
+  NeogitChangeAdded                = { fg = "green", bg = "NONE"  },
+  NeogitChangeDeleted              = { fg = "red", bg = "NONE"    },
+  -- NeogitChangeRenamed           = { fg = "white"               },
+  -- NeogitChangeUpdated           = { fg = "white"               },
+  -- NeogitChangeCopied            = { fg = "white"               },
+  -- NeogitChangeBothModified      = { fg = "white"               },
+  -- NeogitChangeNewFile           = { fg = "white"               },
+  -- NeogitHunkHeader              = { fg = "white"               },
+  -- NeogitDiffContext             = { fg = "sun"                 },
+  NeogitDiffAdd                    = { fg = "green", bg = "NONE"  }, -- bg = "#004717"    },
+  NeogitDiffDelete                 = { fg = "red", bg = "NONE"    }, -- bg = "#611300"      },
+  -- NeogitDiffHeader              = { fg = "grey_fg2"            },
+  -- NeogitHunkHeaderHighlight     = { fg = "grey_fg2"            },
+  -- NeogitDiffContextHighlight    = { fg = "grey_fg"             },
+  NeogitDiffAddHighlight           = { fg = "green",  bg = "NONE" },
+  NeogitDiffDeleteHighlight        = { fg = "red", bg = "NONE"    },
+  -- NeogitDiffHeaderHighlight     = { fg = "grey_fg2"            },
+  -- NeogitCursorLine              = { fg = "white"               },
+  -- NeogitFilePath                = { fg = "white"               },
+  -- NeogitCommitViewHeader        = { fg = "white"               },
+  -- NeogitGraphBlack              = { fg = "black"               },
+  -- NeogitGraphBlackBold          = { fg = "black2"              },
+  -- NeogitGraphRed                = { fg = "red"                 },
+  -- NeogitGraphRedBold            = { fg = "red"                 },
+  -- NeogitGraphGreen              = { fg = "green"               },
+  -- NeogitGraphGreenBold          = { fg = "vibrant_green"       },
+  -- NeogitGraphYellow             = { fg = "yellow"              },
+  -- NeogitGraphYellowBold         = { fg = "sun"                 },
+  -- NeogitGraphBlue               = { fg = "blue"                },
+  -- NeogitGraphBlueBold           = { fg = "nord_blue"           },
+  -- NeogitGraphPurple             = { fg = "purple"              },
+  -- NeogitGraphPurpleBold         = { fg = "dark_purple"         },
+  -- NeogitGraphCyan               = { fg = "cyan"                },
+  -- NeogitGraphCyanBold           = { fg = "teal"                },
+  -- NeogitGraphWhite              = { fg = "white"               },
+  -- NeogitGraphWhiteBold          = { fg = "light_grey"          },
+  -- NeogitGraphGray               = { fg = "grey"                },
+  -- NeogitGraphBoldGray           = { fg = "grey_fg"             },
+  -- NeogitGraphOrange             = { fg = "orange"              },
+  -- NeogitSignatureGood           = { fg = "green"               },
+  -- NeogitSignatureBad            = { fg = "red"                 },
+  -- NeogitSignatureMissing        = { fg = "grey"                },
+  -- NeogitSignatureNone           = { fg = "grey_fg2"            },
+  -- NeogitSignatureGoodUnknown    = { fg = "white"               },
+  -- NeogitSignatureGoodExpired    = { fg = "white"               },
+  -- NeogitSignatureGoodExpiredKey = { fg = "white"               },
+  -- NeogitSignatureGoodRevokedKey = { fg = "white"               },
+  -- NeogitPopupSectionTitle       = { fg = "white"               },
+  -- NeogitPopupBranchName         = { fg = "white"               },
+  -- NeogitPopupBold               = { fg = "white"               },
+  -- NeogitPopupSwitchKey          = { fg = "white"               },
+  -- NeogitPopupSwitchEnabled      = { fg = "white"               },
+  -- NeogitPopupSwitchDisabled     = { fg = "white"               },
+  -- NeogitPopupOptionKey          = { fg = "white"               },
+  -- NeogitPopupOptionEnabled      = { fg = "white"               },
+  -- NeogitPopupOptionDisabled     = { fg = "white"               },
+  -- NeogitPopupConfigKey          = { fg = "white"               },
+  -- NeogitPopupConfigEnabled      = { fg = "white"               },
+  -- NeogitPopupConfigDisabled     = { fg = "white"               },
+  -- NeogitPopupActionKey          = { fg = "white"               },
+  -- NeogitPopupActionDisabled     = { fg = "white"               },
+  -- NeogitNotificationInfo        = { fg = "white"               },
+  -- NeogitNotificationWarning     = { fg = "white"               },
+  -- NeogitNotificationError       = { fg = "white"               },
+  -- NeogitCommandText             = { fg = "white"               },
+  -- NeogitCommandTime             = { fg = "white"               },
+  -- NeogitCommandCodeNormal       = { fg = "white"               },
+  -- NeogitCommandCodeError        = { fg = "white"               },
+  -- stylua: ignore end
+  -- end neogit
 
-  -- Cmp Highlights
-  CmpItemKindCodeium = { fg = "green" },
-  CmpItemKindTabNine = { fg = "pink" },
-  CmpItemKindCopilot = { fg = "cyan" },
+  -- stylua: ignore start
+  BqfPreviewBorder = { fg = "grey_fg2" },
+  BqfPreviewTitle  = { fg = "white"    },
+  BqfPreviewThumb  = { fg = "white"    },
+  BqfPreviewRange  = { fg = "white"    },
+  -- stylua: ignore end
 
-  PackageInfoOutdatedVersion = { fg = "red" },
-  PackageInfoUpToDateVersion = { fg = "green" },
+  -- orgmode
+  -- stylua: ignore start
+  Headline1 = { bg = "#114319"                },
+  Headline2 = { bg = "#424311"                },
+  Headline3 = { bg = "#432111"                },
+  Headline4 = { bg = "#114331"                },
+  Headline5 = { bg = "#113143"                },
+  CodeBlock = { fg = "sun"                    },
+  Dash      = { fg = "grey_fg2",  bold = true },
+  Quote     = { fg = "grey",      bold = true },
+  -- stylua: ignore end
+  -- end orgmode
 
-  VirtColumn = { fg = "black2" },
-  FoldColumn = { bg = "black", fg = "white" },
-  Folded = { bg = "black", fg = "white" },
+  -- pqf
+  -- stylua: ignore start
+  qfPath     = { fg = "yellow" },
+  qfPosition = { fg = "green" },
+  qfError    = { fg = "red" },
+  qfWarning  = { fg = "orange" },
+  qfInfo     = { fg = "nord_blue" },
+  qfHint     = { fg = "purple" },
+  -- stylua: ignore end
+  -- end pqf
 
-  -- SpectreHeader
-  -- SpectreBody
-  -- SpectreFile
-  -- SpectreDir
-  -- SpectreSearch = { fg = "green" },
-  -- SpectreBorder
-  -- SpectreReplace
+  -- marks
+  -- stylua: ignore start
+  MarkSignHL     = { fg = "orange" },
+  MarkSignNumHL  = { fg = "green"  },
+  MarkVirtTextHL = { fg = "sun"    },
+  -- stylua: ignore end
+  -- end marks
 
-  -- Tree Sitter Rainbow
-  RainbowDelimiterRed = { fg = "red" },
-  RainbowDelimiterYellow = { fg = "yellow" },
-  RainbowDelimiterBlue = { fg = "blue" },
-  RainbowDelimiterOrange = { fg = "orange" },
-  RainbowDelimiterGreen = { fg = "green" },
-  RainbowDelimiterViolet = { fg = "purple" },
-  RainbowDelimiterCyan = { fg = "cyan" },
+  -- dap
+  -- stylua: ignore start
+  DapBreakpoint          = { fg = "red" },
+  DapBreakpointCondition = { fg = "vibrant_green" },
+  DapBreakpointRejected  = { fg = "grey_fg2" },
+  -- DapBreakpointNum  = { fg = "red" },
+  -- DapBreakpointLine = { bg = "red" },
 
-  -- Diff
-  DiffChange = { fg = "yellow" },
-  DiffAdd = { fg = "vibrant_green" },
-  DiffText = { fg = "white", bg = "red", bold = true },
+  DapLogPoint     = { fg = "blue" },
+  -- DapLogPointNum  = { fg = "nord_blue" },
+  -- DapLogPointLine = { bg = "nord_blue" },
 
-  DiffviewDim1 = { fg = "grey" },
-  DiffviewReference = { fg = "cyan" },
-  DiffviewPrimary = { fg = "cyan" },
-  DiffviewSecondary = { fg = "blue" },
-  DiffviewNonText = { link = "DiffviewDim1" },
-  DiffviewStatusUnmerged = { link = "GitMerge" },
-  DiffviewStatusUntracked = { link = "GitNew" },
-  DiffviewStatusModified = { link = "GitDirty" },
-  DiffviewStatusRenamed = { link = "GitRenamed" },
-  DiffviewStatusDeleted = { link = "GitDeleted" },
-  DiffviewStatusAdded = { link = "GitStaged" },
-  DiffviewFilePanelRootPath = { link = "NvimTreeRootFolder" },
-  DiffviewFilePanelTitle = { link = "Title" },
-  DiffviewFilePanelCounter = { fg = "cyan" },
-  DiffviewFilePanelInsertions = { link = "GitNew" },
-  DiffviewFilePanelDeletions = { link = "GitDeleted" },
-  DiffviewFilePanelConflicts = { link = "GitMerge" },
-  DiffviewFolderSign = { link = "NvimTreeFolderIcon" },
-  DiffviewDiffDelete = { link = "Comment" },
+  DapStopped     = { fg = "sun" },
+  -- DapStoppedNum  = { fg = "sun" },
+  DapStoppedLine = { bg = "one_bg" },
 
-  GitSignsChange = { fg = "green" },
-  GitSignsAdd = { fg = "vibrant_green" },
-  GitSignsDelete = { fg = "red" },
-  GitSignsText = { fg = "white", bg = "red", bold = true },
+  -- DAP UI
+  DapUIBreakpointsCurrentLine = { fg = "sun" },
+  DapUIBreakpointsPath = { fg = "red" },
+  DapUICurrentFrameName = { fg = "orange" },
+  DapUIDecoration = { fg = "grey" },
+  DapUIFrameName = { fg = "sun" },
+  DapUILineNumber = { fg = "white" },
+  DapUIModifiedValue = { fg = "orange" },
+  DapUIScope = { fg = "red" },
+  DapUISource = { fg = "green" },
+  DapUIStoppedThread = { fg = "cyan" },
+  DapUIType = { fg = "nord_blue" },
 
-  -- Deprecated
-  cssDeprecated = { strikethrough = true },
-  javaScriptDeprecated = { strikethrough = true },
+  DapUIStepOut = { fg = "yellow" },
+  DapUIStepOver = { fg = "nord_blue" },
+  DapUIPlayPause = { fg = "vibrant_green" },
+  DapUIRestart = { fg = "pink" },
+  DapUIStepBack = { fg = "nord_blue" },
+  DapUIStepInto = { fg = "yellow" },
+  DapUIStop = { fg = "red" },
 
-  -- Search highlights
-  HlSearchNear = { fg = "#2E3440", bg = "yellow" },
-  HlSearchLens = { fg = "#2E3440", bg = "blue" },
-  HlSearchLensNear = { fg = "#2E3440", bg = "yellow" },
+  -- DapUI = { fg = "nord_blue" },
+  -- DapUI = { fg = "nord_blue" },
+  DapUIVariable = { fg = "vibrant_green" },
+  DapUIWatchesEmpty = { fg = "red" },
 
-  -- LSP Saga
-  SagaBorder = { fg = "blue" },
-  SagaFolder = { fg = "cyan" },
-  HoverNormal = { fg = "white" },
-  CodeActionText = { fg = "white" },
-  CodeActionNumber = { link = "Number" },
+  -- stylua: ignore end
+  -- end dap
 
-  -- Custom highlights
-  CopilotHl = { fg = "white", bg = "statusline_bg" },
-  HarpoonHl = { fg = "cyan", bg = "statusline_bg" },
-  CmpHl = { fg = "red", bg = "statusline_bg" },
-  NotificationHl = { fg = "white", bg = "statusline_bg" },
-  TermHl = { fg = "green", bg = "statusline_bg" },
-  SplitHl = { fg = "white", bg = "statusline_bg" },
-
-  -- Blankline
-  IndentBlanklineContextChar = { fg = "none" },
-  IndentBlanklineContextStart = { bg = "none" },
-
-  DiagnosticUnnecessary = { link = "", fg = "light_grey" },
-  LspInlayHint = { link = "", fg = "light_grey" },
-
-  -- Noice
-  NoiceCursor = { link = "Cursor" },
-  NoiceCmdlinePopupBorder = { fg = "cyan" },
-  NoiceCmdlinePopupBorderSearch = { fg = "yellow" },
-  NoiceCmdlinePopup = { fg = "cyan" },
-  NoiceConfirm = { fg = "cyan" },
-  NoiceConfirmBorder = { fg = "cyan" },
-  NoicePopup = { fg = "cyan" },
-  NoicePopupBorder = { fg = "cyan" },
-  NoicePopupmenu = { fg = "cyan" },
-
-  HarpoonBorder = { fg = "cyan" },
+  -- stylua: ignore start
+  -- Vim Visual Multi
+  VM_Cursor = { fg = "grey_fg" },
+  -- stylua: ignore end
+  -- end dap
 }
 
 return M

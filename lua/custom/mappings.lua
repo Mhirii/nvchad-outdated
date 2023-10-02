@@ -1,435 +1,436 @@
-
+---@type MappingsTable
 local M = {}
+local extern = require("custom.utils").extern
 
-local function move_or_create_win(key)
-  local fn = vim.fn
-  local curr_win = fn.winnr()
-  vim.cmd("wincmd " .. key) --> attempt to move
-
-  if curr_win == fn.winnr() then --> didn't move, so create a split
-    if key == "h" or key == "l" then
-      vim.cmd "wincmd v"
-    else
-      vim.cmd "wincmd s"
-    end
-
-    vim.cmd("wincmd " .. key)
-  end
-end
-
-M.disabled = {
-  n = {
-    ["<leader>b"] = "",
-    ["<leader>rn"] = { ""}
-  },
-}
+local status = require("custom.utils").status
 
 M.general = {
-  n = {
-    -- Keep cursor in the center line when C-D / C-U
-    ["<C-d>"] = { "<C-d>zz", " Scroll down", opts = { silent = true } },
-    ["<C-u>"] = { "<C-u>zz", " Scroll up", opts = { silent = true } },
-
-
-    ["<leader><leader>rn"] = { "<cmd> set rnu! <CR>", "Toggle relative number" },
-
-    ["<leader>cs"] = { "<CMD>SymbolsOutline<CR>", " Symbols Outline" },
-    ["<leader>tr"] = {
-      function()
-        require("base46").toggle_transparency()
-      end,
-      "󰂵 Toggle transparency",
-    },
-  }
+	n = {
+		["<leader>ww"] = { "<cmd> w<cr>", "Save Changes", opts = { nowait = true } },
+		["<leader>qq"] = { "<cmd> qa<cr>", "Quit Editor", opts = { nowait = true } },
+		["<leader>fq"] = { "<cmd> qa!<cr>", "Force Quit Editor", opts = { nowait = true } },
+		["<leader>wq"] = { "<cmd> wq<cr>", "Write Quit Editor", opts = { nowait = true } },
+		["<leader>ip"] = { "<cmd> Inspect<cr>", "HL Group Under Cursor" },
+	},
 }
 
-M.Telescope = {
-  n = {
-    ["<leader>li"] = { "<CMD>Telescope highlights<CR>", "Highlights" },
-    ["<leader>fk"] = { "<CMD>Telescope keymaps<CR>", " Find keymaps" },
-    ["<leader>fs"] = { "<CMD>Telescope lsp_document_symbols<CR>", " Find document symbols" },
-    ["<leader>fr"] = { "<CMD>Telescope frecency<CR>", " Recent files" },
-    ["<leader>fu"] = { "<CMD>Telescope undo<CR>", " Undo tree" },
-    ["<leader>fg"] = { "<CMD>Telescope ast_grep<CR>", " Structural Search" },
-    ["<leader>fre"] = {
-      function()
-        require("telescope").extensions.refactoring.refactors()
-      end,
-      " Structural Search",
-    },
-    ["<leader>fz"] = {
-      "<CMD>Telescope current_buffer_fuzzy_find fuzzy=false case_mode=ignore_case<CR>",
-      " Find current file",
-    },
-    ["<leader>ff"] = {
-      function()
-        local builtin = require "telescope.builtin"
-        -- ignore opened buffers if not in dashboard or directory
-        if vim.fn.isdirectory(vim.fn.expand "%") == 1 or vim.bo.filetype == "alpha" then
-          builtin.find_files()
-        else
-          local function literalize(str)
-            return str:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", function(c)
-              return "%" .. c
-            end)
-          end
+M.disabled = {
+	n = {
 
-          local function get_open_buffers()
-            local buffers = {}
-            local len = 0
-            local vim_fn = vim.fn
-            local buflisted = vim_fn.buflisted
+		-- LSP
+		-- NOTE: All of these mappings are remapped
+		-- to a compatible keybind. There are all nice
+		--
+		-- diagnostics
+		["<leader>f"] = "",
+		-- loclist
+		["<leader>q"] = "",
 
-            for buffer = 1, vim_fn.bufnr "$" do
-              if buflisted(buffer) == 1 then
-                len = len + 1
-                -- get relative name of buffer without leading slash
-                buffers[len] = "^"
-                  .. literalize(string.gsub(vim.api.nvim_buf_get_name(buffer), literalize(vim.loop.cwd()), ""):sub(2))
-                  .. "$"
-              end
-            end
+		-- Terminal
+		["<leader>v"] = "",
+		["<leader>h"] = "",
 
-            return buffers
-          end
+		-- Buffer
+		["<leader>x"] = "",
+		["<leader>b"] = "",
 
-          builtin.find_files {
-            file_ignore_patterns = get_open_buffers(),
-          }
-        end
-      end,
-      "Find files",
-    },
-  },
+		["<C-s>"] = "",
+
+		-- NvimTree
+		["<C-n>"] = "",
+		["<leader>e"] = "",
+
+		-- Comment
+		-- ["<leader>/"] = "",
+
+		-- Git
+		["<leader>cm"] = "", -- Commits
+		["<leader>ph"] = "", -- Preview hunk
+
+		-- Editor
+		["<leader>n"] = "", -- linenr
+
+		-- Terminal
+		["<leader>pt"] = "",
+
+		-- LSP
+		["<leader>ls"] = "",
+
+		-- NvChad
+		["<leader>th"] = "",
+		["<leader>ra"] = "",
+		["<leader>fo"] = "", -- moved: <leader>fr
+	},
+}
+
+M.themes = {
+	n = {
+		["<leader>ht"] = { "<cmd> Telescope themes <CR>", "Nvchad themes" },
+	},
+}
+
+M.terms = {
+	n = {
+		["<leader>ft"] = {
+			"<cmd> Telescope terms <CR>",
+			"Pick hidden term",
+		},
+	},
 }
 
 M.treesitter = {
-  n = {
-    ["<leader>cu"] = { "<CMD>InspectTree <CR>", " Find highlight" },
-    ["<leader>to"] = { "<CMD>TSJToggle<CR>", "󱓡 Toggle split/join" },
-  },
+	n = {
+		["<leader>nts"] = { "<cmd> Inspect<CR>", "HL groups Under Cursor" },
+		["<leader>ntt"] = { "<cmd> InspectTree<CR>", "Parsed Syntax Tree" },
+		["<leader>ntq"] = { "<cmd> PreviewQuery<CR>", "Query Editor" },
+	},
 }
 
-M.dap = {
-  plugin = true,
-  n = {
-    ["<leader>db"] = {
-      "<cmd> DapToggleBreakpoint <CR>",
-      "Add breakpoint at line"
-    },
-    ["<leader>dr"] = {
-      "<cmd> DapContinue <CR>",
-      "Run or continue the debugger"
-    },
-    ["<leader>dus"] = {
-      function ()
-        local widgets = require('dap.ui.widgets');
-        local sidebar = widgets.sidebar(widgets.scopes);
-        sidebar.open();
-      end,
-      "Open debugging sidebar"
-    }
-  },
+-- Toggling Conceal
+local toggled = false
+M.buffer = {
+	n = {
+		["<leader>bf"] = {
+			function()
+				vim.opt.concealcursor = "nc"
+				if toggled then
+					vim.opt.conceallevel = 0
+					toggled = false
+				else
+					vim.opt.conceallevel = 2
+					toggled = true
+				end
+			end,
+			"Toggle Conceal",
+		},
+		["<leader>bn"] = { "<cmd> enew <CR>", "New buffer" },
+
+		-- quit buffer
+		["<leader>bd"] = {
+			"<cmd> q<CR>",
+			"Close buffer", -- Terminals are hidden
+		},
+
+		-- close buffer + hide terminal buffer
+		["<leader>bk"] = {
+			function()
+				require("nvchad.tabufline").close_buffer()
+			end,
+			"Close buffer", -- Terminals are hidden
+		},
+	},
 }
 
-M.dap_go = {
-  plugin = true,
-  n = {
-    ["<leader>dgt"] = {
-      function()
-        require('dap-go').debug_test()
-      end,
-      "Debug go test"
-    },
-    ["<leader>dgl"] = {
-      function()
-        require('dap-go').debug_last()
-      end,
-      "Debug last go test"
-    }
-  }
+M.sort = {
+	v = {
+		-- <cmd> breaks visual mode selection sorting
+		-- and sorts the whole buffer instead
+		["<leader>sq"] = { ":sort<CR>", "Sort Selection" },
+	},
 }
 
-M.gopher = {
-  plugin = true,
-  n = {
-    ["<leader>gsj"] = {
-      "<cmd> GoTagAdd json <CR>",
-      "Add json struct tags"
-    },
-    ["<leader>gsy"] = {
-      "<cmd> GoTagAdd yaml <CR>",
-      "Add yaml struct tags"
-    }
-  }
+M.nvterm = {
+	n = {
+		["<leader>hh"] = {
+			function()
+				require("nvterm.terminal").new("horizontal")
+			end,
+			"New horizontal term",
+		},
+
+		["<leader>vv"] = {
+			function()
+				require("nvterm.terminal").new("vertical")
+			end,
+			"New vertical term",
+		},
+	},
 }
 
-M.lspsaga = {
-  n = {
-    ["<leader>."] = { "<CMD>CodeActionMenu<CR>", "󰅱 Code Action" },
-    ["<leader>gf"] = {
-      function()
-        vim.cmd "Lspsaga finder"
-      end,
-      " Go to definition",
-    },
-    ["<leader>rn"] = {
-      "<CMD>Lspsaga rename<CR>",
-      " rename",
-    },
-    ["gd"] = {
-      "<CMD>Lspsaga goto_definition<CR>",
-      " Go to definition",
-    },
-    ["<leader>lp"] = {
-      "<CMD>Lspsaga peek_definition<CR>",
-      " Peek definition",
-    },
-    ["<leader>k"] = {
-      -- "<CMD>Lspsaga hover_doc<CR>",
-      function()
-        require("pretty_hover").hover()
-      end,
-      "󱙼 Hover lsp",
-    },
-    ["<leader>o"] = { "<CMD>Lspsaga outline<CR>", " Show Outline" },
-    --  LSP
-    ["gr"] = { "<CMD>Telescope lsp_references<CR>", " Lsp references" },
-    ["[d"] = { "<CMD>Lspsaga diagnostic_jump_prev<CR>", " Prev Diagnostic" },
-    ["]d"] = { "<CMD>Lspsaga diagnostic_jump_next<CR>", " Next Diagnostic" },
-    ["<leader>qf"] = {
-      function()
-        vim.diagnostic.setloclist()
-      end,
-      "󰁨 Lsp Quickfix",
-    },
-  },
-}
-
-M.hop = {
-  n = {
-    ["<leader><leader>w"] = { "<cmd> HopWord <CR>", "hint all words" },
-    ["<leader><leader>b"] = { "<cmd> HopWord <CR>", "hint all words" },
-    ["<leader><leader>j"] = { "<cmd> HopLine <CR>", "hint line" },
-    ["<leader><leader>k"] = { "<cmd> HopLine <CR>", "hint line" },
-  },
-}
-
-M.symbols_outline = {
-  plugin = true,
-  n = {
-    ["<leader>s"] = {"<cmd> SymbolsOutline <CR>"}
-  }
-}
-
-M.development = {
-  n = {
-    ["<leader>i"] = {
-      function()
-        require("nvim-toggler").toggle()
-      end,
-      "󰌁 Invert text",
-    },
-    ["<leader>fm"] = {
-      function()
-        vim.lsp.buf.format { async = true }
-      end,
-      " Lsp formatting",
-    },
-    ["<leader>bi"] = {
-      function()
-        require("nvim-biscuits").toggle_biscuits()
-      end,
-      "󰆘 Toggle context",
-    },
-    ["<A-p>"] = { "<CMD>Colortils picker<CR>", " Delete word" },
-  },
+M.selection = {
+	n = {
+		["<C-M-a>"] = { "gg0vG$", mode = "n", desc = "Select Whole Buffer" },
+	},
 }
 
 M.nvimtree = {
-  n = {
-    ["<C-b>"] = { "<CMD> NvimTreeToggle <CR>", "󰔱 Toggle nvimtree" },
-  },
-  i = {
-    ["<C-b>"] = { "<CMD> NvimTreeToggle <CR>", "󰔱 Toggle nvimtree" },
-  },
+	n = {
+		["<leader>ee"] = { "<cmd> NvimTreeFocus<CR>", "Toggle NvimTree" },
+		["<leader>et"] = { ":NvimTreeToggle<CR>", "Toggle NvimTree" },
+		["<leader>er"] = { ":NvimTreeRefresh<CR>", "Refresh NvimTree" },
+		["<leader>ef"] = { ":NvimTreeFindFile<CR>", "Find File in NvimTree" },
+	},
 }
 
-
-M.split = {
-  n = {
-    ["<C-h>"] = {
-      function()
-        move_or_create_win "h"
-      end,
-      "[h]: Move to window on the left or create a split",
-    },
-    ["<C-j>"] = {
-      function()
-        move_or_create_win "j"
-      end,
-      "[j]: Move to window below or create a vertical split",
-    },
-    ["<C-k>"] = {
-      function()
-        move_or_create_win "k"
-      end,
-      "[k]: Move to window above or create a vertical split",
-    },
-    ["<C-l>"] = {
-      function()
-        move_or_create_win "l"
-      end,
-      "[l]: Move to window on the right or create a split",
-    },
-  },
+M.snippets = {
+	n = {
+		["<leader>es"] = { ":lua require('luasnip.loaders').edit_snippet_files()<CR>", "Edit Snippets" },
+	},
 }
 
-M.text = {
-  i = {
-    -- Move line up and down
-    ["<C-Up>"] = { "<CMD>m .-2<CR>==", "󰜸 Move line up" },
-    ["<C-Down>"] = { "<CMD>m .+1<CR>==", "󰜯 Move line down" },
-
-    -- Navigate
-    ["<A-Left>"] = { "<ESC>I", " Move to beginning of line" },
-    ["<A-Right>"] = { "<ESC>A", " Move to end of line" },
-    ["<A-d>"] = { "<ESC>diw", " Delete word" },
-    ["<S-CR>"] = {
-      function()
-        vim.cmd "normal o"
-      end,
-      " New line",
-    },
-  },
-
-  n = {
-    -- Navigate
-    ["<C-Left>"] = { "<ESC>_", "󰜲 Move to beginning of line" },
-    ["<C-Right>"] = { "<ESC>$", "󰜵 Move to end of line" },
-    ["<C-a>"] = { "gg0vG", " Select all" },
-    ["<F3>"] = { "n", " Next" },
-    ["<S-F3>"] = { "N", " Previous" },
-    -- Operations
-    ["<C-z>"] = { "<CMD>u<CR>", "󰕌 Undo" },
-    ["<C-r>"] = { "<CMD>redo<CR>", "󰑎 Redo" },
-    ["<C-x>"] = { "x", "󰆐 Cut" },
-    ["<C-v>"] = { "p", "󰆒 Paste" },
-    ["<C-c>"] = { "y", " Copy" },
-    ["p"] = { "p`[v`]=", "󰆒 Paste" },
-    ["<leader><leader>d"] = { "viw", " Select word" },
-    ["<leader>d"] = { 'viw"_di', " Delete word" },
-    ["<C-Up>"] = { "<CMD>m .-2<CR>==", "󰜸 Move line up" },
-    ["<C-Down>"] = { "<CMD>m .+1<CR>==", "󰜯 Move line down" },
-    -- Renamer
-    -- ["<leader>mrn"] = { "<CMD>:MurenToggle<CR>", "󱝪 Toggle Search" },
-    ["<leader>sp"] = { "<CMD>:TSJToggle<CR>", "󰯌 Toggle split/join" },
-    ["<A-d>"] = { "<CMD>:MCstart<CR>", "Multi cursor" },
-    ["<leader>ra"] = {
-      function()
-        require("nvchad.renamer").open()
-      end,
-      "󰑕 LSP rename",
-    },
-    -- ["<leader>mrn"] = {
-    --   function()
-    --     return ":IncRename " .. vim.fn.expand "<cword>"
-    --   end,
-    --   -- ":IncRename "
-    --   "󰑕 Rename",
-    --   opts = { expr = true },
-    -- },
-    -- Quit
-    ["<Esc>"] = {
-      function()
-        vim.cmd "noh"
-        vim.cmd "Noice dismiss"
-      end,
-      " Clear highlights",
-      opts = { silent = true },
-    },
-  },
-
-  v = {
-    ["<C-Up>"] = { ":m'<-2<CR>gv=gv", "󰜸 Move selection up", opts = { silent = true } },
-    ["<C-Down>"] = { ":m'>+1<CR>gv=gv", "󰜯 Move selection down", opts = { silent = true } },
-    ["<Home>"] = { "gg", "Home" },
-    ["<End>"] = { "G", "End" },
-    ["y"] = { "y`]", "Yank and move to end" },
-    -- Indent backward/forward:
-    ["<"] = { "<gv", " Ident backward", opts = { silent = false } },
-    [">"] = { ">gv", " Ident forward", opts = { silent = false } },
-
-    ["<C-Left>"] = { "<ESC>_", "󰜲 Move to beginning of line" },
-    ["<C-Right>"] = { "<ESC>$", "󰜵 Move to end of line" },
-  },
-
-  c = {
-    -- Autocomplete for brackets:
-    ["("] = { "()<left>", "Auto complete (", opts = { silent = false } },
-    ["<"] = { "<><left>", "Auto complete <", opts = { silent = false } },
-    ['"'] = { '""<left>', [[Auto complete "]], opts = { silent = false } },
-    ["'"] = { "''<left>", "Auto complete '", opts = { silent = false } },
-  },
+M.resize = {
+	n = {
+		-- Conflicts with moveline
+		-- ["C-M-j"] = { ":resize -2<CR>", "Resize Window -2" },
+		-- ["C-M-k"] = { ":resize +2<CR>", "Resize Window +2" },
+		["H"] = { ":vertical resize +2<cr>", "resize window -2" },
+		["L"] = { ":vertical resize -2<cr>", "resize window +2" },
+	},
 }
 
-M.window = {
-  n = {
-    ["<leader><leader>h"] = { "<CMD>vs <CR>", "󰤼 Vertical split", opts = { nowait = true } },
-    ["<leader><leader>v"] = { "<CMD>sp <CR>", "󰤻 Horizontal split", opts = { nowait = true } },
-  },
+M.config = {
+	n = {
+		["<leader>oc"] = { ":next ~/.config/nvim/lua/custom/*.lua<CR>", "Open Editor Configuration" },
+	},
 }
 
-M.diagnostics = {
-  n = {
-    ["<leader>t"] = { "<CMD>TroubleToggle<CR>", "󰔫 Toggle warnings" },
-    ["<leader>td"] = { "<CMD>TodoTrouble keywords=TODO,FIX,FIXME,BUG,TEST,NOTE<CR>", " Todo/Fix/Fixme" },
-    ["<leader>el"] = { "<CMD>ErrorLensToggle<CR>", "󱇭 Toggle error lens" },
-    ["<leader>ft"] = { "<CMD>TodoTelescope<CR>", " Telescope TODO" },
-    ["<Leader>ll"] = {
-      function()
-        require("lsp_lines").toggle()
-      end,
-      " Toggle lsp_lines",
-    },
-  },
+-- VIMSCRIPT:
+-- function! ZathuraOpenPdf()
+-- 	let fullPath = expand("%:p")
+-- 	let pdfFile = substitute(fullPath, ".tex", ".pdf", "")
+-- 	execute "silent !zathura '" . pdfFile . "' &"
+-- endfunction
+-- END
+--
+-- M.zathura = {
+--   n = {
+--     ["<leader>oz"] = { ":next ~/.config/nvim/lua/custom/*.lua<CR>", "Open in Zathura" },
+--   },
+-- }
+
+M.telescope = {
+	n = {
+		["<leader>fc"] = { ":Telescope builtin<CR>", "Find Editor Command" },
+		["<leader>fr"] = { "<cmd> Telescope oldfiles<CR>", "Recent Files" },
+	},
 }
 
-M.test = {
-  n = {
-    ["<leader>rt"] = {
-      function()
-        require("neotest").run.run(vim.fn.expand "%")
-      end,
-      "󰤑 Run neotest",
-    },
-  },
+M.update = {
+	n = {
+		["<leader>uu"] = { ":NvChadUpdate<CR>", "Update NvChad UI" },
+	},
 }
 
-M.folder = {
-  n = {
-    ["<leader>a"] = {
-      function()
-        require("fold-cycle").toggle_all()
-      end,
-      "󰴋 Toggle folder",
-    },
-    ["<leader>fp"] = {
-      function()
-        require("fold-preview").toggle_preview()
-      end,
-      "󱞊 Fold preview",
-    },
-  },
+M.lazy = {
+	n = {
+		["<leader>ll"] = { ":Lazy<CR>", "Open Plugin Manager" },
+	},
 }
 
-M.searchbox = {
-  n = {
-    ["<C-F>"] = { "<CMD> SearchBoxMatchAll clear_matches=true<CR>", "󱘟 Search matching all" },
-    ["<leader>sr"] = { "<CMD> SearchBoxReplace confirm=menu<CR>", " Replace" },
-  },
+M.mason = {
+	n = {
+		["<leader>om"] = { ":Mason<CR>", "Open LSP Installer" },
+	},
 }
 
+M.git = {
+	n = {
+		["<leader>gc"] = { "<cmd> Telescope git_commits <CR>", "Git commits" },
+	},
+}
+
+M.code = {
+	v = {
+		["<leader>cz"] = {
+			":Telescope lsp_range_code_actions",
+			"Code actions for refactoring",
+		},
+
+		["<leader>ca"] = {
+			function()
+				vim.lsp.buf.code_action()
+			end,
+			"LSP Code Action",
+		},
+	},
+
+	n = {
+		["<leader>sr"] = {
+			function()
+				vim.lsp.buf.signature_help()
+			end,
+			"LSP Signature Help",
+		},
+
+		["<leader>sa"] = {
+			function()
+				require("nvchad.renamer").open()
+			end,
+			"LSP rename",
+		},
+
+		-- now lazy loads nvim-bqf
+		-- ["<leader>li"] = {
+		--   function()
+		--     vim.diagnostic.setloclist()
+		--   end,
+		--   "Diagnostic setloclist",
+		-- },
+
+		["<leader>ss"] = { -- in v mode it sorts
+			function()
+				vim.diagnostic.open_float({ border = "rounded" })
+			end,
+			"Floating diagnostic",
+		},
+	},
+}
+
+M.other = {
+	n = {
+		["<leader>bl"] = { "<cmd> set nu!<cr>", "Toggle line number", opts = { nowait = true } },
+		["<leader>br"] = { "<cmd> set rnu! <CR>", "Toggle relative number" },
+	},
+}
+
+M.dashboard = {
+	n = {
+		["<leader>bi"] = { "<cmd> Nvdash<CR>", "Open Dashboard" },
+	},
+}
+
+M.irc = {
+	n = {
+		["<leader>xi"] = {
+			function()
+				extern("weechat", "vertical")
+				status.irc = true
+			end,
+			"IRC Client",
+		},
+	},
+}
+
+M.hn = {
+	n = {
+		["<leader>xh"] = {
+			function()
+				extern("hackernews_tui", "vertical")
+				status.hn = true
+			end,
+			"Hacker News",
+		},
+	},
+}
+
+M.discord = {
+	n = {
+		["<leader>xd"] = {
+			function()
+				extern("discordo", "vertical")
+				status.discord = true
+			end,
+			"Discord",
+		},
+	},
+}
+
+M.map = {
+	n = {
+		["<leader>xm"] = {
+			function()
+				extern("mapscii", "vertical")
+				status.worldmap = true
+			end,
+			"Open World Map",
+		},
+	},
+}
+
+M.browser = {
+	n = {
+		["<leader>xb"] = {
+			function()
+				extern("browsh", "vertical")
+				status.browser = true
+			end,
+			"Open Browsher",
+		},
+
+		["<leader>xl"] = {
+			function()
+				extern("lynx", "vertical")
+			end,
+			"Open Lynx",
+		},
+	},
+}
+
+M.reddit = {
+	n = {
+		["<leader>xr"] = {
+			function()
+				extern("tuir", "vertical")
+				status.reddit = true
+			end,
+			"Reddit Client",
+		},
+	},
+}
+
+M.stackoverflow = {
+	n = {
+		["<leader>xs"] = {
+			function()
+				local q = vim.fn.input("Query: ")
+				extern("so " .. q, "vertical")
+				status.stackoverflow = true
+			end,
+			"Query StackOverflow",
+		},
+	},
+}
+
+M.mail = {
+	n = {
+		["<leader>xq"] = {
+			function()
+				extern("mutt", "vertical")
+				status.mail = true
+			end,
+			"Email Client",
+		},
+	},
+}
+
+M.ncmpcpp = {
+	n = {
+		["<leader>xa"] = {
+			function()
+				extern("ncmpcpp", "vertical")
+			end,
+			"Music Player",
+		},
+	},
+}
+
+M.whatsapp = {
+	n = {
+		["<leader>xw"] = {
+			function()
+				extern("nchat", "vertical")
+				status.whatsapp = true
+			end,
+			"WhatsApp Client",
+		},
+	},
+}
+
+-- M. = {
+--   n = {
+--  [""] = { "", "" },
+--   },
+-- }
+
+-----------------------------------------------------------
+-- Github Copilot Bindings
+-----------------------------------------------------------
+-- M.copilot = {
+--   mode_opts = { expr = true },
+--   i = {
+--     ["<C-h>"] = { 'copilot#Accept("<Left>")', "   copilot accept" },
+--   },
+-- }
+-- more keybinds!
 
 return M
-
